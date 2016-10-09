@@ -4,14 +4,14 @@ import GCDSwift
 class GCDSwiftTests: XCTestCase {
 
   func testMainQueue() {
-    XCTAssertTrue(GCDQueue.mainQueue.dispatchQueue === dispatch_get_main_queue())
+    XCTAssertTrue(GCDQueue.mainQueue.dispatchQueue === DispatchQueue.main)
   }
 
   func testGlobalQueues() {
-    XCTAssertTrue(GCDQueue.globalQueue.dispatchQueue === dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
-    XCTAssertTrue(GCDQueue.highPriorityGlobalQueue.dispatchQueue === dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0))
-    XCTAssertTrue(GCDQueue.lowPriorityGlobalQueue.dispatchQueue === dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0))
-    XCTAssertTrue(GCDQueue.backgroundPriorityGlobalQueue.dispatchQueue === dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0))
+    XCTAssertTrue(GCDQueue.globalQueue.dispatchQueue === DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default))
+    XCTAssertTrue(GCDQueue.highPriorityGlobalQueue.dispatchQueue === DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.high))
+    XCTAssertTrue(GCDQueue.lowPriorityGlobalQueue.dispatchQueue === DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.low))
+    XCTAssertTrue(GCDQueue.backgroundPriorityGlobalQueue.dispatchQueue === DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background))
   }
   
   func testQueueBlock() {
@@ -31,7 +31,7 @@ class GCDSwiftTests: XCTestCase {
   func testQueueBlockAfterDelay() {
     let semaphore = GCDSemaphore()
     let queue = GCDQueue()
-    let then = NSDate()
+    let then = Date()
     var val = 0
   
     queue.queueBlock({
@@ -43,8 +43,8 @@ class GCDSwiftTests: XCTestCase {
     semaphore.wait()
     XCTAssertEqual(val, 1)
     
-    let now = NSDate()
-    XCTAssertTrue(now.timeIntervalSinceDate(then) > 0.4 && now.timeIntervalSinceDate(then) < 0.6)
+    let now = Date()
+    XCTAssertTrue(now.timeIntervalSince(then) > 0.4 && now.timeIntervalSince(then) < 0.6)
   }
   
   func testQueueAndAwaitBlock() {
@@ -72,7 +72,7 @@ class GCDSwiftTests: XCTestCase {
     let group = GCDGroup()
     var val: Int32 = 0
     
-    for (var i = 0; i < 100; ++i) {
+    for i in 0 ..< 100 += 1 {
       queue.queueBlock({ OSAtomicIncrement32(&val) }, inGroup: group)
     }
   
@@ -87,7 +87,7 @@ class GCDSwiftTests: XCTestCase {
     var val: Int32 = 0
     var notifyVal: Int32 = 0
 
-    for (var i = 0; i < 100; ++i) {
+    for i in 0 ..< 100 += 1 {
       queue.queueBlock({ OSAtomicIncrement32(&val) }, inGroup: group)
     }
     
@@ -106,14 +106,14 @@ class GCDSwiftTests: XCTestCase {
     var val: Int32 = 0
     var barrierVal: Int32 = 0
 
-    for (var i = 0; i < 100; ++i) {
+    for i in 0 ..< 100 += 1 {
       queue.queueBlock({ OSAtomicIncrement32(&val) })
     }
     queue.queueBarrierBlock({
       barrierVal = val
       semaphore.signal()
     })
-    for (var i = 0; i < 100; ++i) {
+    for i in 0 ..< 100 += 1 {
       queue.queueBlock({ OSAtomicIncrement32(&val) })
     }
 
@@ -125,7 +125,7 @@ class GCDSwiftTests: XCTestCase {
     let queue = GCDQueue.concurrentQueue()
     var val: Int32 = 0
 
-    for (var i = 0; i < 100; ++i) {
+    for i in 0 ..< 100 += 1 {
       queue.queueBlock({ OSAtomicIncrement32(&val) })
     }
     queue.queueAndAwaitBarrierBlock({})
